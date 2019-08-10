@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>SepraTube Player</title>
     <link rel="stylesheet" href="css/bootstrap.css">
-
+    <link rel="stylesheet" href="css/toastr.min.css">
 
 </head>
 <body>
@@ -81,6 +81,7 @@
 <script src="https://kit.fontawesome.com/3521d49988.js"></script>
 <script src="js/jquery-3.4.1.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/toastr.min.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script type="text/javascript">
@@ -153,12 +154,38 @@
             if (e.which === 32) {
                 e.preventDefault();
                 togglePlay();
+            } else if (e.which === 65 || e.which === 97) {
+                // A or a
+                e.preventDefault();
+                setABStart();
+            } else if (e.which === 68 || e.which === 100) {
+                // D or d
+                e.preventDefault();
+                setABEnd();
+            } else if (e.which === 83 || e.which === 115) {
+                // S or s
+                e.preventDefault();
+                doLoop();
+            } else if (e.which === 87 || e.which === 119) {
+                // W or w
+                e.preventDefault();
+                setSpeed(.5);
+            } else if (e.which === 81 || e.which === 113) {
+                // Q or q
+                e.preventDefault();
+                setSpeed(.25);
+            } else if (e.which === 69 || e.which === 101) {
+                // E or e
+                e.preventDefault();
+                setSpeed(1);
             }
+
         });
 
         btnABStart.on('click', function (e) {
             setABStart();
         });
+
         btnABEnd.on('click', function (e) {
             setABEnd();
         });
@@ -195,27 +222,33 @@
             index.playVideo(
                 startSeconds = state.abStart
             );
+            toastr.info('Playing video...');
 
         } else {
             index.pauseVideo();
+            toastr.info('Video paused.');
         }
     }
 
     function setABStart() {
         state.abStart = index.getCurrentTime();
+        toastr.info('AB Start set to ' + state.abStart);
     }
 
     function setABEnd() {
         state.abEnd = index.getCurrentTime();
+        toastr.info('AB End set to ' + state.abEnd);
     }
 
     function clearAB() {
         state.abStart = 0;
         state.abEnd = null;
+        toastr.info('AB cleared');
     }
 
     function setSpeed(s) {
         index.setPlaybackRate(s);
+        toastr.info('Playback set to ' + s * 100 + '%');
     }
 
     function doLoop() {
@@ -234,6 +267,7 @@
                 'onStateChange': repeatLoop
             }
         });
+        toastr.info('Looping video from ' + state.abStart + ' to ' + state.abEnd);
     }
 
     function doLoadVideo() {
