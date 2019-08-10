@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SepraTube Player</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+
+
+</head>
+<body>
+
+<div id="video-placeholder"></div>
+<div class="container-fluid">
+    <div class="btn-group btn-group-sm float-right">
+        <a class="btn btn-success" href="#!" id="btnLoadVideo" data-toggle="modal" data-target="#modalLoadVideo">
+            <i class="fab fa-youtube"></i> Load Video
+        </a>
+    </div>
+    <div class="btn-group btn-group-sm">
+        <a class="btn btn-primary" href="#!" id="btnPlay">
+            <i class="far fa-play-circle"></i> Play
+        </a>
+        <a class="btn btn-outline-info" href="#!" id="btnSetABStart">
+            <i class="fa fa-step-forward"></i> A/B Start
+        </a>
+        <a class="btn btn-outline-info" href="#!" id="btnSetABEnd">
+            <i class="fa fa-step-backward"></i> A/B End
+        </a>
+        <a class="btn btn-outline-danger" href="#!" id="btnClearAB">
+            <i class="fa fa-trash"></i> Clear A/B
+        </a>
+        <a class="btn btn-outline-success" href="#!" id="btnLoop">
+            <i class="fa fa-history"></i> Loop
+        </a>
+    </div>
+
+    <div class="btn-group btn-group-sm">
+        <a class="btn btn-secondary" href="#!" id="btnSpeedSlow">
+            25%
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnSpeedMedium">
+            50%
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnSpeedNormal">
+            100%
+        </a>
+    </div>
+</div>
+
+<div class="modal" id="modalLoadVideo" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Load YouTube Video</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="txtYoutubeLink">YouTube link:</label>
+                    <input type="url" class="form-control" name="txtYoutubeLink" id="txtYoutubeLink"
+                           placeholder="https://www.youtube.com/watch?v=IdkCEioCp24">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnDoLoad">Load</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/3521d49988.js"></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script type="text/javascript">
+    var player;
+    var winX = window.innerWidth;
+    var winY = window.innerHeight * .9;
+
+    // state
+    var state = {
+        abStart: 0,
+        abEnd: null,
+        videoID: 'IdkCEioCp24'
+    };
+
+    var playerConfig = {
+        width: winX,
+        height: winY,
+        videoId: state.videoID,
+        playerVars: {
+            color: 'black',
+            autoplay: 1,
+            showinfo: 0,
+            autohide: 1,
+            loop: 1
+        },
+        events: {
+            onReady: initialize,
+            'onStateChange': repeatLoop
+        }
+    };
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('video-placeholder', playerConfig);
+    }
+
+    function repeatLoop(st) {
+        if (st.data === YT.PlayerState.ENDED) {
+            player.seekTo(state.abStart);
+        }
+    }
+
+    function initialize() {
+
+
+    }
+
+
+    // UI
+    // buttons
+    var btnPlay = $("#btnPlay");
+    var btnABStart = $("#btnSetABStart");
+    var btnABEnd = $("#btnSetABEnd");
+    var btnLoop = $("#btnLoop");
+    var btnClearAB = $("#btnClearAB");
+    var btnSpeedSlow = $("#btnSpeedSlow");
+    var btnSpeedMedium = $("#btnSpeedMedium");
+    var btnSpeedNormal = $("#btnSpeedNormal");
+    var btnDoLoad = $("#btnDoLoad");
+    // form elements
+    var txtYoutubeLink = $("#txtYoutubeLink");
+
+
+    $(document).ready(function () {
+
+        btnPlay.on('click', function (e) {
+            e.preventDefault();
+            togglePlay();
+        });
+        $('body').bind('keypress', function (e) {
+            if (e.which === 32) {
+                e.preventDefault();
+                togglePlay();
+            }
+        });
+
+        btnABStart.on('click', function (e) {
+            setABStart();
+        });
+        btnABEnd.on('click', function (e) {
+            setABEnd();
+        });
+
+        btnLoop.on('click', function (e) {
+            doLoop();
+        });
+
+        btnClearAB.on('click', function (e) {
+            clearAB();
+        });
+
+        btnSpeedSlow.on('click', function (e) {
+            setSpeed(0.25);
+        });
+
+        btnSpeedMedium.on('click', function (e) {
+            setSpeed(0.5);
+        });
+
+        btnSpeedNormal.on('click', function (e) {
+            setSpeed(1);
+        });
+
+        btnDoLoad.on('click', function (e) {
+            doLoadVideo();
+        })
+
+    });
+
+
+    function togglePlay() {
+        if (player.getPlayerState() !== 1) {
+            player.playVideo(
+                startSeconds = state.abStart
+            );
+
+        } else {
+            player.pauseVideo();
+        }
+    }
+
+    function setABStart() {
+        state.abStart = player.getCurrentTime();
+    }
+
+    function setABEnd() {
+        state.abEnd = player.getCurrentTime();
+    }
+
+    function clearAB() {
+        state.abStart = 0;
+        state.abEnd = null;
+    }
+
+    function setSpeed(s) {
+        player.setPlaybackRate(s);
+    }
+
+    function doLoop() {
+        player.loadVideoById({
+            videoId: state.videoID,
+            startSeconds: state.abStart,
+            endSeconds: state.abEnd,
+            playerVars: {
+                color: 'black',
+                autoplay: 1,
+                showinfo: 0,
+                autohide: 1,
+                loop: 1
+            },
+            events: {
+                'onStateChange': repeatLoop
+            }
+        });
+    }
+
+    function doLoadVideo() {
+        var link = txtYoutubeLink.val();
+        state.videoID = link.split("v=")[1].split("&")[0];
+        doLoop();
+
+    }
+
+
+</script>
+</body>
+</html>
