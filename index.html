@@ -46,6 +46,15 @@
         </a>
     </div>
 </div>
+<hr>
+<div class="container-fluid">
+    <p class="text-secondary">
+        <small>
+            MIT @copy; 2019 <a href="https://github.com/jorgec">Jorge Cosgayon</a> |
+            <a href="https://github.com/jorgec/sepratube-static">Feel free to fork or send a PR</a>
+        </small>
+    </p>
+</div>
 
 <div class="modal" id="modalLoadVideo" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -106,12 +115,12 @@
     };
 
     function onYouTubeIframeAPIReady() {
-        player = new YT.Player('video-placeholder', playerConfig);
+        index = new YT.Player('video-placeholder', playerConfig);
     }
 
     function repeatLoop(st) {
         if (st.data === YT.PlayerState.ENDED) {
-            player.seekTo(state.abStart);
+            index.seekTo(state.abStart);
         }
     }
 
@@ -184,22 +193,22 @@
 
 
     function togglePlay() {
-        if (player.getPlayerState() !== 1) {
-            player.playVideo(
+        if (index.getPlayerState() !== 1) {
+            index.playVideo(
                 startSeconds = state.abStart
             );
 
         } else {
-            player.pauseVideo();
+            index.pauseVideo();
         }
     }
 
     function setABStart() {
-        state.abStart = player.getCurrentTime();
+        state.abStart = index.getCurrentTime();
     }
 
     function setABEnd() {
-        state.abEnd = player.getCurrentTime();
+        state.abEnd = index.getCurrentTime();
     }
 
     function clearAB() {
@@ -208,11 +217,11 @@
     }
 
     function setSpeed(s) {
-        player.setPlaybackRate(s);
+        index.setPlaybackRate(s);
     }
 
     function doLoop() {
-        player.loadVideoById({
+        index.loadVideoById({
             videoId: state.videoID,
             startSeconds: state.abStart,
             endSeconds: state.abEnd,
