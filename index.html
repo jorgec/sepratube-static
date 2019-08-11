@@ -384,30 +384,42 @@
         toastr.info('Playback set to ' + s * 100 + '%');
     }
 
-    function doLoop() {
+    function doLoop(fromStart=false) {
         state.isLooping = true;
-        player.loadVideoById({
-            videoId: state.videoID,
-            startSeconds: state.abStart,
-            endSeconds: state.abEnd,
-            playerVars: {
-                color: 'black',
-                autoplay: 1,
-                showinfo: 0,
-                autohide: 1,
-                loop: 1
-            },
-            events: {
-                'onStateChange': repeatLoop
-            }
-        });
+
+        if(fromStart){
+            player.loadVideoById({
+                videoId: state.videoID,
+                playerVars: playerConfig,
+                events: {
+                    'onStateChange': repeatLoop
+                }
+            })
+        }else{
+            player.loadVideoById({
+                videoId: state.videoID,
+                startSeconds: state.abStart,
+                endSeconds: state.abEnd,
+                playerVars: {
+                    color: 'black',
+                    autoplay: 1,
+                    showinfo: 0,
+                    autohide: 1,
+                    loop: 1
+                },
+                events: {
+                    'onStateChange': repeatLoop
+                }
+            });
+        }
+
         toastr.info('Looping video from ' + state.abStart + ' to ' + state.abEnd);
     }
 
     function doLoadVideo() {
         var link = txtYoutubeLink.val();
         state.videoID = link.split("v=")[1].split("&")[0];
-        doLoop();
+        doLoop(true);
 
     }
 
