@@ -5,13 +5,21 @@
     <title>SepraTube Player</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/toastr.min.css">
-
+    <style type="text/css">
+        body{
+            width: 100vw;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
 
 <div id="video-placeholder"></div>
 <div class="container-fluid">
     <div class="btn-group btn-group-sm float-right">
+        <a class="btn btn-info" href="#!" data-toggle="modal" data-target="#modalHelp">
+            <i class="fa fa-question"></i>
+        </a>
         <a class="btn btn-success" href="#!" id="btnLoadVideo" data-toggle="modal" data-target="#modalLoadVideo">
             <i class="fab fa-youtube"></i> Load Video
         </a>
@@ -20,6 +28,14 @@
         <a class="btn btn-primary" href="#!" id="btnPlay">
             <i class="far fa-play-circle"></i> Play
         </a>
+        <a class="btn btn-secondary" href="#!" id="btnBack">
+            <i class="fa fa-backward"></i> -5s
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnFwd">
+            <i class="fa fa-forward"></i> +5s
+        </a>
+    </div>
+    <div class="btn-group btn-group-sm">
         <a class="btn btn-outline-info" href="#!" id="btnSetABStart">
             <i class="fa fa-step-forward"></i> A/B Start
         </a>
@@ -46,12 +62,12 @@
         </a>
     </div>
 </div>
-<hr>
 <div class="container">
-    <p class="text-secondary text-center">
+    <div id="state"></div>
+    <small class="text-secondary text-center">
         MIT @copy; 2019 <a href="https://github.com/jorgec">Jorge Cosgayon</a> |
         <a href="https://github.com/jorgec/sepratube-static">Feel free to fork or send a PR</a>
-    </p>
+    </small>
 </div>
 
 <div class="modal" id="modalLoadVideo" tabindex="-1" role="dialog">
@@ -78,6 +94,43 @@
     </div>
 </div>
 
+<div class="modal" id="modalHelp" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-responsive-sm">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Key</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Play/Pause</td><td>Spacebar</td></tr>
+                        <tr><td>+5 secs</td><td>L or l</td></tr>
+                        <tr><td>-5 secs</td><td>J or j</td></tr>
+                        <tr><td>Set AB Start</td><td>A or a</td></tr>
+                        <tr><td>Set AB End</td><td>D or d</td></tr>
+                        <tr><td>Loop over AB</td><td>S or s</td></tr>
+                        <tr><td>Set speed to 25%</td><td>Q or q</td></tr>
+                        <tr><td>Set speed to 50%</td><td>W or w</td></tr>
+                        <tr><td>Set speed to 100%</td><td>E or e</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://kit.fontawesome.com/3521d49988.js"></script>
 <script src="js/jquery-3.4.1.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
@@ -93,7 +146,8 @@
     var state = {
         abStart: 0,
         abEnd: null,
-        videoID: 'IdkCEioCp24'
+        videoID: 'IdkCEioCp24',
+        isLooping: false
     };
 
     var playerConfig = {
@@ -105,28 +159,13 @@
             autoplay: 1,
             showinfo: 0,
             autohide: 1,
-            loop: 1
+            loop: 0
         },
         events: {
             onReady: initialize,
             'onStateChange': repeatLoop
         }
     };
-
-    function onYouTubeIframeAPIReady() {
-        index = new YT.Player('video-placeholder', playerConfig);
-    }
-
-    function repeatLoop(st) {
-        if (st.data === YT.PlayerState.ENDED) {
-            index.seekTo(state.abStart);
-        }
-    }
-
-    function initialize() {
-
-
-    }
 
 
     // UI
@@ -140,8 +179,30 @@
     var btnSpeedMedium = $("#btnSpeedMedium");
     var btnSpeedNormal = $("#btnSpeedNormal");
     var btnDoLoad = $("#btnDoLoad");
+    var btnBack = $("#btnBack");
+    var btnFwd = $("#btnFwd");
     // form elements
     var txtYoutubeLink = $("#txtYoutubeLink");
+
+    var shortcuts = {
+        32: togglePlay,
+        65: setABStart,
+        97: setABStart,
+        68: setABEnd,
+        100: setABEnd,
+        83: doLoop,
+        115: doLoop,
+        87: setSpeed50,
+        119: setSpeed50,
+        81: setSpeed25,
+        113: setSpeed25,
+        69: setSpeed100,
+        101: setSpeed100,
+        76: seekFwd5,
+        108: seekFwd5,
+        74: seekBwd5,
+        106: seekBwd5
+    };
 
 
     $(document).ready(function () {
@@ -150,36 +211,20 @@
             e.preventDefault();
             togglePlay();
         });
-        $('body').bind('keypress', function (e) {
-            if (e.which === 32) {
-                e.preventDefault();
-                togglePlay();
-            } else if (e.which === 65 || e.which === 97) {
-                // A or a
-                e.preventDefault();
-                setABStart();
-            } else if (e.which === 68 || e.which === 100) {
-                // D or d
-                e.preventDefault();
-                setABEnd();
-            } else if (e.which === 83 || e.which === 115) {
-                // S or s
-                e.preventDefault();
-                doLoop();
-            } else if (e.which === 87 || e.which === 119) {
-                // W or w
-                e.preventDefault();
-                setSpeed(.5);
-            } else if (e.which === 81 || e.which === 113) {
-                // Q or q
-                e.preventDefault();
-                setSpeed(.25);
-            } else if (e.which === 69 || e.which === 101) {
-                // E or e
-                e.preventDefault();
-                setSpeed(1);
-            }
 
+        btnBack.on('click', function(e){
+            e.preventDefault();
+            seekTo(-5);
+        });
+        btnFwd.on('click', function(e){
+            e.preventDefault();
+            seekTo(5);
+        });
+
+        $('body').bind('keypress', function (e) {
+            e.preventDefault();
+
+            shortcuts[e.which]();
         });
 
         btnABStart.on('click', function (e) {
@@ -216,43 +261,89 @@
 
     });
 
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('video-placeholder', playerConfig);
+    }
+
+    function repeatLoop(st) {
+        if (st.data === YT.PlayerState.ENDED) {
+            player.seekTo(state.abStart);
+        }
+    }
+
+    function initialize() {
+
+
+    }
+
+
 
     function togglePlay() {
-        if (index.getPlayerState() !== 1) {
-            index.playVideo(
+        if (player.getPlayerState() !== 1) {
+            player.playVideo(
                 startSeconds = state.abStart
             );
             toastr.info('Playing video...');
 
         } else {
-            index.pauseVideo();
+            player.pauseVideo();
             toastr.info('Video paused.');
         }
     }
 
+    function seekFwd5(){
+        seekTo(5);
+    }
+
+    function seekBwd5(){
+        seekTo(-5)
+    }
+
+    function seekTo(t){
+        var current = player.getCurrentTime();
+        var newTime = current + parseInt(t);
+        player.seekTo(newTime);
+        toastr.info("Skipping " + t + " secs...");
+    }
+
     function setABStart() {
-        state.abStart = index.getCurrentTime();
+        state.abStart = player.getCurrentTime();
         toastr.info('AB Start set to ' + state.abStart);
     }
 
     function setABEnd() {
-        state.abEnd = index.getCurrentTime();
+        state.abEnd = player.getCurrentTime();
         toastr.info('AB End set to ' + state.abEnd);
     }
 
     function clearAB() {
-        state.abStart = 0;
+        state.isLooping = false;
+        state.abStart = player.getCurrentTime();
         state.abEnd = null;
+        doLoop();
         toastr.info('AB cleared');
     }
 
+    function setSpeed25(){
+        setSpeed(.25);
+    }
+
+    function setSpeed50(){
+        setSpeed(.50);
+    }
+
+    function setSpeed100(){
+        setSpeed(100);
+    }
+
     function setSpeed(s) {
-        index.setPlaybackRate(s);
+        player.setPlaybackRate(s);
         toastr.info('Playback set to ' + s * 100 + '%');
     }
 
     function doLoop() {
-        index.loadVideoById({
+        state.isLooping = true;
+        player.loadVideoById({
             videoId: state.videoID,
             startSeconds: state.abStart,
             endSeconds: state.abEnd,
