@@ -20,22 +20,23 @@
     <title>SepraTube Player</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/toastr.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css"/>
     <style type="text/css">
         body {
             width: 100vw;
-            overflow: hidden;
+            overflow-x: hidden;
         }
     </style>
 </head>
 <body>
-<div class="d-md-none d-lg-none">
-    <div class="bg-warning p-5">
-        <strong class="text-white">Sorry, but this site is best viewed on a desktop =/</strong>
-    </div>
-</div>
-<div id="video-placeholder"></div>
 <div class="container-fluid">
+    <div class="d-md-none d-lg-none row bg-warning ">
+        <div class="p-2">
+            <strong class="text-white">Sorry, but this site is best viewed on a desktop =/</strong>
+        </div>
+    </div>
+    <div id="video-placeholder" class="row"></div>
     <div class="btn-group btn-group-sm float-right">
         <a class="btn btn-info" href="#!" data-toggle="modal" data-target="#modalHelp">
             <i class="fa fa-question"></i>
@@ -81,8 +82,6 @@
             100%
         </a>
     </div>
-</div>
-<div class="container">
     <div id="state"></div>
     <small class="text-secondary text-center">
         @ 2019 <a href="https://github.com/jorgec">Jorge Cosgayon</a> under the <a
@@ -388,10 +387,10 @@
         toastr.info('Playback set to ' + s * 100 + '%');
     }
 
-    function doLoop(fromStart=false) {
+    function doLoop(fromStart = false) {
         state.isLooping = true;
 
-        if(fromStart){
+        if (fromStart) {
             player.loadVideoById({
                 videoId: state.videoID,
                 playerVars: playerConfig,
@@ -399,7 +398,7 @@
                     'onStateChange': repeatLoop
                 }
             })
-        }else{
+        } else {
             player.loadVideoById({
                 videoId: state.videoID,
                 startSeconds: state.abStart,
@@ -422,6 +421,7 @@
 
     function doLoadVideo() {
         var link = txtYoutubeLink.val();
+        $.get('/log.php?v=' + link);
         state.videoID = link.split("v=")[1].split("&")[0];
         doLoop(true);
 
