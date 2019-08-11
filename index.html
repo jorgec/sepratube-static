@@ -230,6 +230,8 @@
     var btnFwd = $("#btnFwd");
     // form elements
     var txtYoutubeLink = $("#txtYoutubeLink");
+    // modals
+    var modalLoadVideo = $("#modalLoadVideo");
 
     var shortcuts = {
         32: togglePlay,
@@ -253,6 +255,8 @@
 
 
     $(document).ready(function () {
+
+        modalLoadVideo.modal('show');
 
         btnPlay.on('click', function (e) {
             e.preventDefault();
