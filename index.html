@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-55095-19"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-55095-19');
+    </script>
+
+
     <meta charset="UTF-8">
     <title>SepraTube Player</title>
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/toastr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css" />
     <style type="text/css">
-        body{
+        body {
             width: 100vw;
             overflow: hidden;
         }
@@ -65,7 +81,8 @@
 <div class="container">
     <div id="state"></div>
     <small class="text-secondary text-center">
-        MIT @copy; 2019 <a href="https://github.com/jorgec">Jorge Cosgayon</a> |
+        @ 2019 <a href="https://github.com/jorgec">Jorge Cosgayon</a> under the <a
+            href="https://opensource.org/licenses/MIT">MIT</a> license |
         <a href="https://github.com/jorgec/sepratube-static">Feel free to fork or send a PR</a>
     </small>
 </div>
@@ -106,21 +123,48 @@
             <div class="modal-body">
                 <table class="table table-responsive-sm">
                     <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Key</th>
-                        </tr>
+                    <tr>
+                        <th>Action</th>
+                        <th>Key</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        <tr><td>Play/Pause</td><td>Spacebar</td></tr>
-                        <tr><td>+5 secs</td><td>L or l</td></tr>
-                        <tr><td>-5 secs</td><td>J or j</td></tr>
-                        <tr><td>Set AB Start</td><td>A or a</td></tr>
-                        <tr><td>Set AB End</td><td>D or d</td></tr>
-                        <tr><td>Loop over AB</td><td>S or s</td></tr>
-                        <tr><td>Set speed to 25%</td><td>Q or q</td></tr>
-                        <tr><td>Set speed to 50%</td><td>W or w</td></tr>
-                        <tr><td>Set speed to 100%</td><td>E or e</td></tr>
+                    <tr>
+                        <td>Play/Pause</td>
+                        <td>Spacebar</td>
+                    </tr>
+                    <tr>
+                        <td>+5 secs</td>
+                        <td>L or l</td>
+                    </tr>
+                    <tr>
+                        <td>-5 secs</td>
+                        <td>J or j</td>
+                    </tr>
+                    <tr>
+                        <td>Set AB Start</td>
+                        <td>A or a</td>
+                    </tr>
+                    <tr>
+                        <td>Set AB End</td>
+                        <td>D or d</td>
+                    </tr>
+                    <tr>
+                        <td>Loop over AB</td>
+                        <td>S or s</td>
+                    </tr>
+                    <tr>
+                        <td>Set speed to 25%</td>
+                        <td>Q or q</td>
+                    </tr>
+                    <tr>
+                        <td>Set speed to 50%</td>
+                        <td>W or w</td>
+                    </tr>
+                    <tr>
+                        <td>Set speed to 100%</td>
+                        <td>E or e</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -212,11 +256,11 @@
             togglePlay();
         });
 
-        btnBack.on('click', function(e){
+        btnBack.on('click', function (e) {
             e.preventDefault();
             seekTo(-5);
         });
-        btnFwd.on('click', function(e){
+        btnFwd.on('click', function (e) {
             e.preventDefault();
             seekTo(5);
         });
@@ -277,7 +321,6 @@
     }
 
 
-
     function togglePlay() {
         if (player.getPlayerState() !== 1) {
             player.playVideo(
@@ -291,15 +334,15 @@
         }
     }
 
-    function seekFwd5(){
+    function seekFwd5() {
         seekTo(5);
     }
 
-    function seekBwd5(){
+    function seekBwd5() {
         seekTo(-5)
     }
 
-    function seekTo(t){
+    function seekTo(t) {
         var current = player.getCurrentTime();
         var newTime = current + parseInt(t);
         player.seekTo(newTime);
@@ -324,15 +367,15 @@
         toastr.info('AB cleared');
     }
 
-    function setSpeed25(){
+    function setSpeed25() {
         setSpeed(.25);
     }
 
-    function setSpeed50(){
+    function setSpeed50() {
         setSpeed(.50);
     }
 
-    function setSpeed100(){
+    function setSpeed100() {
         setSpeed(100);
     }
 
@@ -369,6 +412,26 @@
     }
 
 
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+<script>
+    window.cookieconsent.initialise({
+        "palette": {
+            "popup": {
+                "background": "#aa0000",
+                "text": "#ffdddd"
+            },
+            "button": {
+                "background": "#ff0000"
+            }
+        },
+        "theme": "edgeless",
+        "position": "top",
+        "content": {
+            "message": "This website uses cookies and collects data and shitz. Not to be confused with \"Angkol\" Coockie."
+        }
+    });
 </script>
 </body>
 </html>
