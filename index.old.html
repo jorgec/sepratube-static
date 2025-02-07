@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-55095-19"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-55095-19');
+    </script>
+
+
+    <meta charset="UTF-8">
+    <title>SepraTube Player</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/toastr.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.css"/>
+    <style type="text/css">
+        body {
+            width: 100vw;
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="d-md-none d-lg-none row bg-warning ">
+        <div class="p-2">
+            <strong class="text-white">Sorry, but this site is best viewed on a desktop =/</strong>
+        </div>
+    </div>
+    <div id="video-placeholder" class="row"></div>
+    <div class="btn-group btn-group-sm float-right">
+        <a class="btn btn-info" href="#!" data-toggle="modal" data-target="#modalHelp">
+            <i class="fa fa-question"></i>
+        </a>
+        <a class="btn btn-success" href="#!" id="btnLoadVideo" data-toggle="modal" data-target="#modalLoadVideo">
+            <i class="fab fa-youtube"></i> Load Video
+        </a>
+    </div>
+    <div class="btn-group btn-group-sm">
+        <a class="btn btn-primary" href="#!" id="btnPlay">
+            <i class="far fa-play-circle"></i> Play
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnBack">
+            <i class="fa fa-backward"></i> -5s
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnFwd">
+            <i class="fa fa-forward"></i> +5s
+        </a>
+    </div>
+    <div class="btn-group btn-group-sm">
+        <a class="btn btn-outline-info" href="#!" id="btnSetABStart">
+            <i class="fa fa-step-forward"></i> A/B Start
+        </a>
+        <a class="btn btn-outline-info" href="#!" id="btnSetABEnd">
+            <i class="fa fa-step-backward"></i> A/B End
+        </a>
+        <a class="btn btn-outline-danger" href="#!" id="btnClearAB">
+            <i class="fa fa-trash"></i> Clear A/B
+        </a>
+        <a class="btn btn-outline-success" href="#!" id="btnLoop">
+            <i class="fa fa-history"></i> Loop
+        </a>
+    </div>
+
+    <div class="btn-group btn-group-sm">
+        <a class="btn btn-secondary" href="#!" id="btnSpeedSlow">
+            25%
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnSpeedMedium">
+            50%
+        </a>
+        <a class="btn btn-secondary" href="#!" id="btnSpeedNormal">
+            100%
+        </a>
+    </div>
+    <div id="state"></div>
+    <small class="text-secondary text-center">
+        @ 2019 <a href="https://github.com/jorgec">Jorge Cosgayon</a> under the <a
+            href="https://opensource.org/licenses/MIT">MIT</a> license |
+        <a href="https://github.com/jorgec/sepratube-static">Feel free to fork or send a PR</a>
+    </small>
+</div>
+
+<div class="modal" id="modalLoadVideo" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Load YouTube Video</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="txtYoutubeLink">YouTube link:</label>
+                    <input type="url" class="form-control" name="txtYoutubeLink" id="txtYoutubeLink"
+                           placeholder="https://www.youtube.com/watch?v=IdkCEioCp24">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnDoLoad">Load</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="modalHelp" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shortcuts</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-responsive-sm">
+                    <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Key</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Play/Pause</td>
+                        <td>Spacebar</td>
+                    </tr>
+                    <tr>
+                        <td>+5 secs</td>
+                        <td>L or l</td>
+                    </tr>
+                    <tr>
+                        <td>-5 secs</td>
+                        <td>J or j</td>
+                    </tr>
+                    <tr>
+                        <td>Set AB Start</td>
+                        <td>A or a</td>
+                    </tr>
+                    <tr>
+                        <td>Set AB End</td>
+                        <td>D or d</td>
+                    </tr>
+                    <tr>
+                        <td>Loop over AB</td>
+                        <td>S or s</td>
+                    </tr>
+                    <tr>
+                        <td>Set speed to 25%</td>
+                        <td>Q or q</td>
+                    </tr>
+                    <tr>
+                        <td>Set speed to 50%</td>
+                        <td>W or w</td>
+                    </tr>
+                    <tr>
+                        <td>Set speed to 100%</td>
+                        <td>E or e</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/3521d49988.js"></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/toastr.min.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<script type="text/javascript">
+    var player;
+    var winX = window.innerWidth;
+    var winY = window.innerHeight * .9;
+
+    // state
+    var state = {
+        abStart: 0,
+        abEnd: null,
+        videoID: 'IdkCEioCp24',
+        isLooping: false
+    };
+
+    var playerConfig = {
+        width: winX,
+        height: winY,
+        videoId: state.videoID,
+        playerVars: {
+            color: 'black',
+            autoplay: 1,
+            showinfo: 0,
+            autohide: 1,
+            loop: 0
+        },
+        events: {
+            onReady: initialize,
+            'onStateChange': repeatLoop
+        }
+    };
+
+
+    // UI
+    // buttons
+    var btnPlay = $("#btnPlay");
+    var btnABStart = $("#btnSetABStart");
+    var btnABEnd = $("#btnSetABEnd");
+    var btnLoop = $("#btnLoop");
+    var btnClearAB = $("#btnClearAB");
+    var btnSpeedSlow = $("#btnSpeedSlow");
+    var btnSpeedMedium = $("#btnSpeedMedium");
+    var btnSpeedNormal = $("#btnSpeedNormal");
+    var btnDoLoad = $("#btnDoLoad");
+    var btnBack = $("#btnBack");
+    var btnFwd = $("#btnFwd");
+    // form elements
+    var txtYoutubeLink = $("#txtYoutubeLink");
+    // modals
+    var modalLoadVideo = $("#modalLoadVideo");
+
+    var shortcuts = {
+        32: togglePlay,
+        65: setABStart,
+        97: setABStart,
+        68: setABEnd,
+        100: setABEnd,
+        83: doLoop,
+        115: doLoop,
+        87: setSpeed50,
+        119: setSpeed50,
+        81: setSpeed25,
+        113: setSpeed25,
+        69: setSpeed100,
+        101: setSpeed100,
+        76: seekFwd5,
+        108: seekFwd5,
+        74: seekBwd5,
+        106: seekBwd5
+    };
+
+
+    $(document).ready(function () {
+
+        modalLoadVideo.modal('show');
+
+        btnPlay.on('click', function (e) {
+            e.preventDefault();
+            togglePlay();
+        });
+
+        btnBack.on('click', function (e) {
+            e.preventDefault();
+            seekTo(-5);
+        });
+        btnFwd.on('click', function (e) {
+            e.preventDefault();
+            seekTo(5);
+        });
+
+        $('body').bind('keypress', function (e) {
+            e.preventDefault();
+
+            shortcuts[e.which]();
+        });
+
+        btnABStart.on('click', function (e) {
+            setABStart();
+        });
+
+        btnABEnd.on('click', function (e) {
+            setABEnd();
+        });
+
+        btnLoop.on('click', function (e) {
+            doLoop();
+        });
+
+        btnClearAB.on('click', function (e) {
+            clearAB();
+        });
+
+        btnSpeedSlow.on('click', function (e) {
+            setSpeed(0.25);
+        });
+
+        btnSpeedMedium.on('click', function (e) {
+            setSpeed(0.5);
+        });
+
+        btnSpeedNormal.on('click', function (e) {
+            setSpeed(1);
+        });
+
+        btnDoLoad.on('click', function (e) {
+            doLoadVideo();
+        })
+
+    });
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('video-placeholder', playerConfig);
+    }
+
+    function repeatLoop(st) {
+        if (st.data === YT.PlayerState.ENDED) {
+            player.seekTo(state.abStart);
+        }
+    }
+
+    function initialize() {
+
+
+    }
+
+
+    function togglePlay() {
+        if (player.getPlayerState() !== 1) {
+            player.playVideo(
+                startSeconds = state.abStart
+            );
+            toastr.info('Playing video...');
+
+        } else {
+            player.pauseVideo();
+            toastr.info('Video paused.');
+        }
+    }
+
+    function seekFwd5() {
+        seekTo(5);
+    }
+
+    function seekBwd5() {
+        seekTo(-5)
+    }
+
+    function seekTo(t) {
+        var current = player.getCurrentTime();
+        var newTime = current + parseInt(t);
+        player.seekTo(newTime);
+        toastr.info("Skipping " + t + " secs...");
+    }
+
+    function setABStart() {
+        state.abStart = player.getCurrentTime();
+        toastr.info('AB Start set to ' + state.abStart);
+    }
+
+    function setABEnd() {
+        state.abEnd = player.getCurrentTime();
+        toastr.info('AB End set to ' + state.abEnd);
+    }
+
+    function clearAB() {
+        state.isLooping = false;
+        state.abStart = player.getCurrentTime();
+        state.abEnd = null;
+        doLoop();
+        toastr.info('AB cleared');
+    }
+
+    function setSpeed25() {
+        setSpeed(.25);
+    }
+
+    function setSpeed50() {
+        setSpeed(.50);
+    }
+
+    function setSpeed100() {
+        setSpeed(1);
+    }
+
+    function setSpeed(s) {
+        player.setPlaybackRate(s);
+        toastr.info('Playback set to ' + s * 100 + '%');
+    }
+
+    function doLoop(fromStart = false) {
+        state.isLooping = true;
+
+        if (fromStart) {
+            player.loadVideoById({
+                videoId: state.videoID,
+                playerVars: playerConfig,
+                events: {
+                    'onStateChange': repeatLoop
+                }
+            })
+        } else {
+            player.loadVideoById({
+                videoId: state.videoID,
+                startSeconds: state.abStart,
+                endSeconds: state.abEnd,
+                playerVars: {
+                    color: 'black',
+                    autoplay: 1,
+                    showinfo: 0,
+                    autohide: 1,
+                    loop: 1
+                },
+                events: {
+                    'onStateChange': repeatLoop
+                }
+            });
+        }
+
+        toastr.info('Looping video from ' + state.abStart + ' to ' + state.abEnd);
+    }
+
+    function doLoadVideo() {
+        var link = txtYoutubeLink.val();
+        $.get('/log.php?v=' + link);
+        state.videoID = link.split("v=")[1].split("&")[0];
+        doLoop(true);
+
+    }
+
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js" data-cfasync="false"></script>
+<script>
+    window.cookieconsent.initialise({
+        "palette": {
+            "popup": {
+                "background": "#aa0000",
+                "text": "#ffdddd"
+            },
+            "button": {
+                "background": "#ff0000"
+            }
+        },
+        "theme": "edgeless",
+        "position": "top",
+        "content": {
+            "message": "This website collects data about the videos you load, FYI."
+        }
+    });
+</script>
+</body>
+</html>
